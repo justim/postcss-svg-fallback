@@ -1,5 +1,9 @@
 {
 	"name": "postcss-svg-fallback",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/justim/postcss-svg-fallback"
+	},
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
