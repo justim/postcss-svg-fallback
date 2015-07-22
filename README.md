@@ -1,4 +1,4 @@
-# svg-fallback
+# svg-fallback [![Build Status](https://secure.travis-ci.org/justim/postcss-svg-fallback.png)](https://travis-ci.org/justim/postcss-svg-fallback)
 
 > An automatic SVG converter for your CSS files, built on top of the [PostCSS] ecosystem.
 
