@@ -109,13 +109,15 @@ function processImage(options, image, cb) {
 		dest
 	];
 
-	async.map([source, dest], fs.stat, function(err, rs) {
-		if (rs[0]) {
-			if (!rs[1] || rs[0].mtime > rs[1].mtime) {
-				runPhantomJs(args, cb);
-			} else {
-				cb();
-			}
+	fs.stat(source, function(err, sourceStat) {
+		if (sourceStat) {
+			fs.stat(dest, function(err, destStat) {
+				if (!destStat || sourceStat.mtime > destStat.mtime) {
+					runPhantomJs(args, cb);
+				} else {
+					cb();
+				}
+			});
 		} else {
 			cb();
 		}
