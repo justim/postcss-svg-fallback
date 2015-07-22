@@ -1,11 +1,11 @@
 {
 	"name": "postcss-svg-fallback",
+	"description": "An automatic SVG converter for your CSS files",
 	"repository": {
 		"type": "git",
 		"url": "git://github.com/justim/postcss-svg-fallback"
 	},
 	"version": "1.0.0",
-	"description": "",
 	"main": "index.js",
 	"dependencies": {
 		"postcss": "~4.1.9",
