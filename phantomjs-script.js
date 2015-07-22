@@ -19,6 +19,7 @@ var page = require('webpage').create();
 page.open(image.image, function(status) {
 	if (status !== 'success') {
 		console.error('Could not open file');
+		phantom.exit();
 		return;
 	}
 
