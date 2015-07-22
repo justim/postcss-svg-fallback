@@ -30,6 +30,7 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 			var newImage;
 			var newRule;
 			var newDecl;
+			var matchedBackgroundImageDecl;
 
 			// skip our added rules
 			if (rule.selector.indexOf(fallbackSelector) !== -1) {
@@ -45,6 +46,7 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 
 					if (backgroundImageMatch) {
 						backgroundImage = backgroundImageMatch[1];
+						matchedBackgroundImageDecl = decl;
 					}
 				}
 
@@ -70,10 +72,13 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 				});
 
 				newRule = postcss.rule({ selector: fallbackSelector + ' ' + rule.selector });
+				newRule.source = rule.source;
+
 				newDecl = postcss.decl({
 					prop: 'background-image',
 					value: 'url(' + newImage + ')'
 				});
+				newDecl.source = matchedBackgroundImageDecl.source;
 
 				newRule.append(newDecl);
 				rule.parent.insertAfter(rule, newRule);
