@@ -11,15 +11,19 @@ var postcss = require('postcss')
 var svgFallback = require('postcss-svg-fallback')
 
 var input = read(/* read some css */);
-var output = postcss()
+postcss()
 	.use(svgFallback({
 		basePath: '', // base path for the images found in the css
 		dest: '', // destination for the generated SVGs
 		fallbackSelector: '.no-svg', // selector that gets prefixed to selector
 	})
 	.process(input)
-	.toString();
+	.then(function(processor) {
+		var output = processor.toString();
+	});
 ```
+
+> Note: we must use the async version of postcss
 
 Converts this:
 
