@@ -73,4 +73,27 @@ describe('svg-fallback', function() {
 
 	});
 
+	describe('warnings', function() {
+
+		it ('should emit one warning when file is not found', function(done) {
+			var input = '.icon {\n' +
+				'	background: url(images/non-existent.svg) no-repeat;\n' +
+				'	background-size: 20px 20px;\n' +
+				'}';
+
+			return transform(input).then(function(result) {
+				var totalWarnings = result.warnings().length;
+
+				if (totalWarnings === 1) {
+					done();
+				} else if (totalWarnings === 0) {
+					done(new Error('no warnings were emitted'));
+				} else {
+					done(new Error('too many warnings were emitted: ' + totalWarnings));
+				}
+			}).catch(done);
+		});
+
+	});
+
 });

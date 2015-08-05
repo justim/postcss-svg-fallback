@@ -66,6 +66,8 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 				newImage = backgroundImage.replace(/\.svg$/, '-' + backgroundSize.width + 'x' + backgroundSize.height + '.png');
 
 				images.push({
+					postcssResult: result,
+					postcssRule: rule,
 					image: backgroundImage,
 					newImage: newImage,
 					size: backgroundSize
@@ -119,6 +121,10 @@ function processImage(options, image, cb) {
 				}
 			});
 		} else {
+			image.postcssResult.warn(
+				'Could not find "' + image.image + '" at "' + source + '"',
+				{ node: image.postcssRule });
+
 			cb();
 		}
 	});
