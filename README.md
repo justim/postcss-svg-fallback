@@ -16,6 +16,7 @@ postcss()
 		basePath: '', // base path for the images found in the css
 		dest: '', // destination for the generated SVGs
 		fallbackSelector: '.no-svg', // selector that gets prefixed to selector
+		disableConvert: false, // when `true` only the css is changed (no new files created)
 	})
 	.process(input)
 	.then(function(processor) {

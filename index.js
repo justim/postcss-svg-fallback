@@ -17,9 +17,11 @@ var backgroundSizeRegex = /^(\d+)px( (\d+)px)?$/;
 
 module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 	var fallbackSelector;
+	var disableConvert;
 	options = options || {};
 
 	fallbackSelector = options.fallbackSelector || '.no-svg';
+	disableConvert = options.disableConvert || false;
 
 	return function (css, result) {
 		var images = [];
@@ -56,7 +58,7 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 					if (backgroundSizeMatch) {
 						backgroundSize = {
 							width: parseInt(backgroundSizeMatch[1]),
-							height: parseInt(backgroundSizeMatch[3] || backgroundSizeMatch[1])
+							height: parseInt(backgroundSizeMatch[3] || backgroundSizeMatch[1]),
 						};
 					}
 				}
@@ -70,7 +72,7 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 					postcssRule: rule,
 					image: backgroundImage,
 					newImage: newImage,
-					size: backgroundSize
+					size: backgroundSize,
 				});
 
 				newRule = postcss.rule({ selector: fallbackSelector + ' ' + rule.selector });
@@ -78,7 +80,7 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 
 				newDecl = postcss.decl({
 					prop: 'background-image',
-					value: 'url(' + newImage + ')'
+					value: 'url(' + newImage + ')',
 				});
 				newDecl.source = matchedBackgroundImageDecl.source;
 
@@ -86,6 +88,10 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 				rule.parent.insertAfter(rule, newRule);
 			}
 		});
+
+		if (disableConvert) {
+			return when.resolve();
+		}
 
 		return when.promise(function(resolve, reject) {
 			async.eachSeries(images, processImage.bind(null, options), function(err) {
@@ -108,12 +114,12 @@ function processImage(options, image, cb) {
 		source,
 		image.size.width,
 		image.size.height,
-		dest
+		dest,
 	];
 
-	fs.stat(source, function(err, sourceStat) {
+	fs.stat(source, function(sourceErr, sourceStat) {
 		if (sourceStat) {
-			fs.stat(dest, function(err, destStat) {
+			fs.stat(dest, function(destErr, destStat) {
 				if (!destStat || sourceStat.mtime > destStat.mtime) {
 					runPhantomJs(args, cb);
 				} else {

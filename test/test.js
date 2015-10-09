@@ -1,4 +1,5 @@
 
+/* global describe, beforeEach, it */
 'use strict';
 
 var fs = require('fs');
@@ -9,12 +10,18 @@ var postcss = require('postcss');
 var svgFallback = require('../index.js');
 
 
-function transform(input) {
+function transform(input, extraOptions) {
+	var options = {
+		basePath: 'test',
+		dest: 'test',
+	};
+
+	if (extraOptions && extraOptions.disableConvert) {
+		options = extraOptions.disableConvert;
+	}
+
 	return postcss()
-		.use(svgFallback({
-			basePath: 'test',
-			dest: 'test',
-		}))
+		.use(svgFallback(options))
 		.process(input);
 }
 
@@ -34,11 +41,11 @@ describe('svg-fallback', function() {
 			'}';
 
 		var expectedImage = __dirname + '/images/expected-email-20x20.png';
-		var expectedImagePath = __dirname + '/images/email-20x20.png';
+		var generatedImagePath = __dirname + '/images/email-20x20.png';
 
 		// clean up side effects
 		beforeEach(function(done) {
-			fs.unlink(expectedImagePath, function() {
+			fs.unlink(generatedImagePath, function() {
 				done();
 			});
 		});
@@ -53,11 +60,11 @@ describe('svg-fallback', function() {
 
 		it('should create a correct png file as a side effect', function(done) {
 			return transform(inputCss).then(function() {
-				fs.readFile(expectedImagePath, function(err, actualContents) {
-					if (!err) {
-						fs.readFile(expectedImage, function(err, expectedContents) {
-							if (err) {
-								done(err);
+				fs.readFile(generatedImagePath, function(generatedImageError, actualContents) {
+					if (!generatedImageError) {
+						fs.readFile(expectedImage, function(expectedImageError, expectedContents) {
+							if (expectedImageError) {
+								done(expectedImageError);
 							} else if (actualContents.compare(expectedContents) !== 0) {
 								done(new Error('png contents are not the same as expected'));
 							} else {
@@ -65,10 +72,28 @@ describe('svg-fallback', function() {
 							}
 						});
 					} else {
-						done(err);
+						done(generatedImageError);
 					}
 				});
 			});
+		});
+
+		it ('should change the css without create new files (when option set)', function(done) {
+			var options = {
+				disableConvert: true,
+			};
+
+			return transform(inputCss, options).then(function(result) {
+				expect(result.css).to.equal(expectedCssOutput);
+
+				fs.stat(generatedImagePath, function(generatedImageError) {
+					if (generatedImageError) {
+						done();
+					} else {
+						done(new Error('file was created when expected not to'));
+					}
+				});
+			}).catch(done);
 		});
 
 	});
