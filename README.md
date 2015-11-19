@@ -33,6 +33,11 @@ Converts this:
 	background: url(images/sun-is-shining.svg) no-repeat;
 	background-size: 20px 20px; /* background-size is mandatory */
 }
+
+.icon-inline {
+	background: url(data:image/svg+xml; .. svg data ..) no-repeat;
+	background-size: 20px 20px; /* background-size is mandatory */
+}
 ```
 
 to this:
@@ -50,6 +55,16 @@ to this:
 	 * with default settings, that's right next to the original SVG
 	 */
 	background-image: url(images/sun-is-shining-20x20.png);
+}
+
+.icon-inline {
+	background: url(data:image/svg+xml; .. svg data ..) no-repeat;
+	background-size: 20px 20px; /* background-size is mandatory */
+}
+
+.no-svg .icon-inline {
+	/* filename contains the hash of the svg data */
+	background-image: url(3547c094eaf671040650cdcab2ca70fd-20x20.png);
 }
 ```
 

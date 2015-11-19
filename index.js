@@ -3,6 +3,7 @@
 
 var path = require('path');
 var fs = require('fs');
+var crypto = require('crypto');
 
 var postcss = require('postcss');
 var async = require('async');
@@ -12,8 +13,12 @@ var childProcess = require('child_process');
 
 var phantomjsScript = path.resolve(__dirname, './phantomjs-script.js');
 
-var backgroundImageRegex = /url\('?([^')]+\.svg)'?\)/;
+var backgroundImageRegex = /url\(('|")?(([^\1]+\.svg)|(data:image\/svg\+xml;[^\1]+))\1\)/;
 var backgroundSizeRegex = /^(\d+)px( (\d+)px)?$/;
+
+function hash(input) {
+	return crypto.createHash('md5').update(input).digest('hex');
+}
 
 module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 	var fallbackSelector;
@@ -27,12 +32,14 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 		var images = [];
 
 		css.eachRule(function(rule) {
+			var inlineBackground;
 			var backgroundImage;
 			var backgroundSize;
 			var newImage;
 			var newRule;
 			var newDecl;
 			var matchedBackgroundImageDecl;
+			var suffix;
 
 			// skip our added rules
 			if (rule.selector.indexOf(fallbackSelector) !== -1) {
@@ -47,8 +54,15 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 					backgroundImageMatch = backgroundImageRegex.exec(decl.value);
 
 					if (backgroundImageMatch) {
-						backgroundImage = backgroundImageMatch[1];
 						matchedBackgroundImageDecl = decl;
+
+						if (backgroundImageMatch[3]) {
+							inlineBackground = false;
+							backgroundImage = backgroundImageMatch[3];
+						} else {
+							inlineBackground = true;
+							backgroundImage = backgroundImageMatch[4];
+						}
 					}
 				}
 
@@ -65,9 +79,16 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 			});
 
 			if (backgroundImage && backgroundSize) {
-				newImage = backgroundImage.replace(/\.svg$/, '-' + backgroundSize.width + 'x' + backgroundSize.height + '.png');
+				suffix = '-' + backgroundSize.width + 'x' + backgroundSize.height + '.png';
+
+				if (inlineBackground) {
+					newImage = hash(backgroundImage) + suffix;
+				} else {
+					newImage = backgroundImage.replace(/\.svg$/, suffix);
+				}
 
 				images.push({
+					inline: inlineBackground,
 					postcssResult: result,
 					postcssRule: rule,
 					image: backgroundImage,
@@ -111,26 +132,34 @@ function processImage(options, image, cb) {
 
 	var args = [
 		phantomjsScript,
-		source,
+		image.inline ? image.image : source,
 		image.size.width,
 		image.size.height,
 		dest,
 	];
 
-	fs.stat(source, function(sourceErr, sourceStat) {
-		if (sourceStat) {
-			fs.stat(dest, function(destErr, destStat) {
-				if (!destStat || sourceStat.mtime > destStat.mtime) {
-					runPhantomJs(args, cb);
-				} else {
-					cb();
-				}
-			});
-		} else {
-			image.postcssResult.warn(
-				'Could not find "' + image.image + '" at "' + source + '"',
-				{ node: image.postcssRule });
+	if (image.inline) {
+		statDest(null, dest, args, cb);
+	} else {
+		fs.stat(source, function(sourceErr, sourceStat) {
+			if (sourceStat) {
+				statDest(sourceStat, dest, args, cb);
+			} else {
+				image.postcssResult.warn(
+					'Could not find "' + image.image + '" at "' + source + '"',
+					{ node: image.postcssRule });
 
+				cb();
+			}
+		});
+	}
+}
+
+function statDest(sourceStat, dest, args, cb) {
+	fs.stat(dest, function(destErr, destStat) {
+		if (!destStat || !sourceStat || sourceStat.mtime > destStat.mtime) {
+			runPhantomJs(args, cb);
+		} else {
 			cb();
 		}
 	});
