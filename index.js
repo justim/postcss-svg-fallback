@@ -13,7 +13,7 @@ var childProcess = require('child_process');
 
 var phantomjsScript = path.resolve(__dirname, './phantomjs-script.js');
 
-var backgroundImageRegex = /url\(('|")?(([^\1]+\.svg)|(data:image\/svg\+xml;[^\1]+))\1\)/;
+var backgroundImageRegex = /url\(('|")?(([^\1]+\.svg)|(data:image\/svg\+xml;?[^\1]+))\1\)/;
 var backgroundSizeRegex = /^(\d+)px( (\d+)px)?$/;
 
 function hash(input) {
