@@ -150,6 +150,36 @@ describe('svg-fallback', function() {
 
 	});
 
+	describe('multiple-selector', function() {
+		var inputCss = '.icon, .icon-2 {\n' +
+			'	background: url(images/email.svg) no-repeat;\n' +
+			'	background-size: 20px 20px;\n' +
+			'}';
+
+		// we expect the same input as output, plus an extra rule
+		var expectedCssOutput = inputCss + '\n' +
+			'.no-svg .icon, .no-svg .icon-2 {\n' +
+			'	background-image: url(images/email-20x20.png);\n' +
+			'}';
+		var generatedImagePath = __dirname + '/images/email-20x20.png';
+
+		// clean up side effects
+		beforeEach(function(done) {
+			fs.unlink(generatedImagePath, function() {
+				done();
+			});
+		});
+
+		it('should add prefix to each selector', function(done) {
+			transform(inputCss).then(function(result) {
+				expect(result.css).to.equal(expectedCssOutput);
+
+				done();
+			}).catch(done);
+		});
+
+	});
+
 	describe('warnings', function() {
 		it ('should emit one warning when file is not found', function(done) {
 			var input = '.icon {\n' +
