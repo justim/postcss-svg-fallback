@@ -5,7 +5,7 @@
 		"type": "git",
 		"url": "git://github.com/justim/postcss-svg-fallback"
 	},
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"main": "index.js",
 	"dependencies": {
 		"postcss": "~4.1.9",
