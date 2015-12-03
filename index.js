@@ -96,7 +96,13 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 					size: backgroundSize,
 				});
 
-				newRule = postcss.rule({ selector: fallbackSelector + ' ' + rule.selector });
+				var newSelector = rule.selector.split(',')
+					.map(function (selector) {
+						return fallbackSelector + ' ' + selector.trim();
+					})
+					.join(', ');
+
+				newRule = postcss.rule({ selector: newSelector });
 				newRule.source = rule.source;
 
 				newDecl = postcss.decl({
