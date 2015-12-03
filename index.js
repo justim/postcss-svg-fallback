@@ -40,6 +40,7 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 			var newDecl;
 			var matchedBackgroundImageDecl;
 			var suffix;
+			var newSelectors;
 
 			// skip our added rules
 			if (rule.selector.indexOf(fallbackSelector) !== -1) {
@@ -96,7 +97,11 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 					size: backgroundSize,
 				});
 
-				newRule = postcss.rule({ selector: fallbackSelector + ' ' + rule.selector });
+				newSelectors = rule.selectors.map(function(selector) {
+					return fallbackSelector + ' ' + selector;
+				});
+
+				newRule = postcss.rule({ selectors: newSelectors });
 				newRule.source = rule.source;
 
 				newDecl = postcss.decl({
