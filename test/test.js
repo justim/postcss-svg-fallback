@@ -148,6 +148,27 @@ describe('svg-fallback', function() {
 			});
 		});
 
+		it('should not rewrite a file if hashes are equals', function(done) {
+			return transform(inputCss).then(function() {
+				fs.stat(generatedImagePath, function(generatedImageError, generatedStatsFirst) {
+					if (!generatedImageError) {
+						transform(inputCss).then(function() {
+							fs.stat(generatedImagePath, function(generatedImageError, generatedStatsSecond) {
+								if (!generatedImageError) {
+									expect(generatedStatsSecond.mtime.getTime()).to.eql(generatedStatsFirst.mtime.getTime());
+									done();
+								} else {
+									done(generatedImageError);
+								}
+							});
+						});
+					} else {
+						done(generatedImageError);
+					}
+				});
+			});
+		});
+
 	});
 
 	describe('multiple-selector', function() {
