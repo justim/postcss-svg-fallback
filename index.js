@@ -133,7 +133,7 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 
 function processImage(options, image, cb) {
 	var source = path.resolve(options.basePath || '', image.image);
-	var dest = path.resolve(options.dest || '', image.newImage);
+	var dest = path.resolve(path.join(process.cwd(), options.dest || '') || '', image.newImage);
 
 	var args = [
 		phantomjsScript,
