@@ -13,10 +13,21 @@ var svgFallback = require('postcss-svg-fallback')
 var input = read(/* read some css */);
 postcss()
 	.use(svgFallback({
-		basePath: '', // base path for the images found in the css
-		dest: '', // destination for the generated SVGs
-		fallbackSelector: '.no-svg', // selector that gets prefixed to selector
-		disableConvert: false, // when `true` only the css is changed (no new files created)
+		// base path for the images found in the css
+		// this is most likely the path to the css file you're processing
+		// not setting this option might lead to unexpected behavior
+		basePath: '',
+
+		// destination for the generated SVGs
+		// this is most likely the path to where the generated css file is outputted
+		// not setting this option might lead to unexpected behavior
+		dest: '',
+
+		// selector that gets prefixed to selector
+		fallbackSelector: '.no-svg',
+
+		// when `true` only the css is changed (no new files created)
+		disableConvert: false,
 	})
 	.process(input)
 	.then(function(processor) {
