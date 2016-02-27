@@ -5,6 +5,7 @@
 var fs = require('fs');
 
 var expect = require('chai').expect;
+var extend = require('extend');
 
 var postcss = require('postcss');
 var svgFallback = require('../index.js');
@@ -16,8 +17,8 @@ function transform(input, extraOptions) {
 		dest: 'test',
 	};
 
-	if (extraOptions && extraOptions.disableConvert) {
-		options = extraOptions.disableConvert;
+	if (extraOptions) {
+		extend(true, options, extraOptions);
 	}
 
 	return postcss()
