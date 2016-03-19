@@ -15,7 +15,8 @@
 	},
 	"devDependencies": {
 		"mocha": "",
-		"chai": ""
+		"chai": "",
+		"extend": ""
 	},
 	"keywords": [
 		"postcss",
