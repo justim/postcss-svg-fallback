@@ -4,11 +4,12 @@
 var path = require('path');
 var fs = require('fs');
 var crypto = require('crypto');
+var isWin = /^win/.test(process.platform); //Temporary workaround for https://github.com/ariya/phantomjs/issues/14194
 
 var postcss = require('postcss');
 var async = require('async');
 var when = require('when');
-var phantomjs = require('phantomjs');
+var phantomjs = require('phantomjs-prebuilt');
 var childProcess = require('child_process');
 
 var phantomjsScript = path.resolve(__dirname, './phantomjs-script.js');
@@ -132,12 +133,13 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 });
 
 function processImage(options, image, cb) {
-	var source = path.join(options.basePath || '', image.image);
+	var source = path.resolve(path.join(options.basePath || '', image.image));
+	var sourceUrl = isWin ? 'file:///' + source : source;
 	var dest = path.join(options.dest || '', image.newImage);
 
 	var args = [
 		phantomjsScript,
-		image.inline ? image.image : source,
+		image.inline ? image.image : sourceUrl,
 		image.size.width,
 		image.size.height,
 		dest,
