@@ -59,7 +59,7 @@ describe('svg-fallback', function() {
 		});
 
 		it('should create a correct png file as a side effect', function(done) {
-			return transform(inputCss).then(function() {
+			transform(inputCss).then(function() {
 				fs.readFile(generatedImagePath, function(generatedImageError, actualContents) {
 					if (!generatedImageError) {
 						fs.readFile(expectedImage, function(expectedImageError, expectedContents) {
@@ -83,7 +83,7 @@ describe('svg-fallback', function() {
 				disableConvert: true,
 			};
 
-			return transform(inputCss, options).then(function(result) {
+			transform(inputCss, options).then(function(result) {
 				expect(result.css).to.equal(expectedCssOutput);
 
 				fs.stat(generatedImagePath, function(generatedImageError) {
@@ -130,7 +130,7 @@ describe('svg-fallback', function() {
 		});
 
 		it('should create a correct png file as a side effect', function(done) {
-			return transform(inputCss).then(function() {
+			transform(inputCss).then(function() {
 				fs.readFile(generatedImagePath, function(generatedImageError, actualContents) {
 					if (!generatedImageError) {
 						fs.readFile(expectedImage, function(expectedImageError, expectedContents) {
@@ -150,7 +150,7 @@ describe('svg-fallback', function() {
 		});
 
 		it('should not rewrite a file if hashes are equals', function(done) {
-			return transform(inputCss).then(function() {
+			transform(inputCss).then(function() {
 				fs.stat(generatedImagePath, function(generatedImageError, generatedStatsFirst) {
 					if (!generatedImageError) {
 						transform(inputCss).then(function() {
@@ -209,7 +209,7 @@ describe('svg-fallback', function() {
 				'	background-size: 20px 20px;\n' +
 				'}';
 
-			return transform(input).then(function(result) {
+			transform(input).then(function(result) {
 				var totalWarnings = result.warnings().length;
 
 				if (totalWarnings === 1) {
