@@ -14,9 +14,9 @@
 		"when": "~3.7.3"
 	},
 	"devDependencies": {
-		"mocha": "",
-		"chai": "",
-		"extend": ""
+		"mocha": "~3.2.0",
+		"chai": "~3.5.0",
+		"extend": "~3.0.0"
 	},
 	"keywords": [
 		"postcss",
