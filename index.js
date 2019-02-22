@@ -30,8 +30,10 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 
 	return function (css, result) {
 		var images = [];
+		var rulesMethodName = !!css.walkRules ? 'walkRules' : 'eachRule';
+		var declsMethodName = !!css.walkRules ? 'walkDecls' : 'eachDecl';
 
-		css.eachRule(function(rule) {
+		css[rulesMethodName](function(rule) {
 			var inlineBackground;
 			var backgroundImage;
 			var backgroundSize;
@@ -47,7 +49,7 @@ module.exports = postcss.plugin('postcss-svg-fallback', function(options) {
 				return;
 			}
 
-			rule.eachDecl(function(decl) {
+			rule[declsMethodName](function(decl) {
 				var backgroundImageMatch;
 				var backgroundSizeMatch;
 
